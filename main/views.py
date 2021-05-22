@@ -6,7 +6,7 @@ from .models import Producto
 
 # Create your views here.
 def home(request): 
-    return HttpResponse("Hola elvhan")
+    return HttpResponse("Hola")
 
 class ProductListView(ListView):
     model = Producto
