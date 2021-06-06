@@ -94,30 +94,38 @@ class Proveedor(models.Model):
 
 class Pedido(models.Model):
     # Relaciones
-    cliente = models.ForeignKey('Cliente', on_delete=models.CASCADE)
-    repatidor = models.ForeignKey('Colaborador', on_delete=models.SET_NULL, null=True)
+    cliente = models.ForeignKey('Cliente', on_delete=models.CASCADE, null=True)
+    repartidor = models.ForeignKey('Colaborador', on_delete=models.SET_NULL, null=True)
     ubicacion = models.ForeignKey('Localizacion', on_delete=models.SET_NULL, null=True)
 
     # Atributos
     fecha_creacion = models.DateTimeField(auto_now=True)
     fecha_entrega = models.DateTimeField(blank=True, null=True)
     estado = models.CharField(max_length=3)
-    direccion_entrega = models.CharField(max_length=100)
-    tarifa = models.FloatField()
+    direccion_entrega = models.CharField(max_length=100, blank=True, null=True)
+    tarifa = models.FloatField(blank=True, null=True)
 
     def __str__(self):
         return f'{self.cliente} - {self.fecha_creacion} - {self.estado}'
 
+    def get_total(self):
+        detalles = self.detallepedido_set.all()
+        total = 0
+        for detalle in detalles:
+            total += detalle.get_subtotal()
+        total += self.tarifa
+        return total
+
 class DetallePedido(models.Model):
     # Relaciones
     producto = models.ForeignKey('Producto', on_delete=models.CASCADE)
-    pedido = models.ForeignKey('Pedido', on_delete=models.CASCADE)
+    pedido = models.ForeignKey('Pedido', on_delete=models.CASCADE, null=True)
 
     # Atributos
-    cantidad = models.IntegerField()
+    cantidad = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
         return f'{self.pedido.id} - {self.cantidad} x {self.producto.nombre}'
 
-    def subtotal(self):
+    def get_subtotal(self):
         return self.producto.precio_final() * self.cantidad
