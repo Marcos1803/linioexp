@@ -129,4 +129,3 @@ class DetallePedido(models.Model):
 
     def get_subtotal(self):
         return self.producto.precio_final() * self.cantidad
-    
