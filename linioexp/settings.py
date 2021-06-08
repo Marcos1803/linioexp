@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'storages',
     'main.apps.MainConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -130,3 +131,10 @@ EMAIL_PORT = '2525'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
+
+DEFAULT_FILE_STORAGE = 'storages.backends.dropbox.DropBoxStorage'
+DROPBOX_OAUTH2_TOKEN = 'uRdy3HGK3dIAAAAAAAAAASGXPWfkDlvBYxRDtFEy2JQYfYOb9POZh6_RyEXfdzaT'
+
+# Django Heroku
+import django_heroku
+django_heroku.settings(locals())
