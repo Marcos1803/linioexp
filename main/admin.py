@@ -16,6 +16,15 @@ class ProfileAdmin(admin.ModelAdmin):
         ColaboradorInline
     ]
 
+class ProductoImageInline(admin.TabularInline):
+    model=ProductoImage
+
+
+class ProductoAdmin(admin.ModelAdmin):
+    inlines = [
+        ProductoImageInline,
+    ]
+
 # Register your models here.
 # admin.site.register(Profile)
 admin.site.register(Cliente)
