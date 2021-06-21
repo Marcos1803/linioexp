@@ -1,38 +1,44 @@
 {% extends "base.html" %}
-
 {% block content %}
-<div class="columns">
-    {% for image in object.images.all %}
-    <div class="column is-3">
-        <figure class="image is-square">
-            <a href="{{ image.image.url }}">
-                <img src="{{ image.image.url }}" alt="No hay imagen disponible">
-            </a>
-        </figure>
+    <h1 class="title">{{ object.nombre }}</h1>
+    <div class="columns">
+        {% for image in object.images.all %}
+        <div class="column is-3">
+            <figure class="image is-square">
+                <a href="{{ image.image.url }}">
+                    <img src="{{ image.image.url }}" alt="No hay imagen disponible">
+                </a>
+            </figure>
+        </div>
+        {% empty %}
+        <div class="column content">
+            <p>Aún no hay imágenes disponibles</p>
+        </div>
+        {% endfor %}
     </div>
-    {% empty %}
-    <div class="column content">
-        <p>Aún no hay imágenes disponibles</p>
-    </div>
-    {% endfor %}
-</div>
-    <h1> Linio Exp </h1>
-    <hr>
-    <h3> {{ object.nombre }} </h3>
     <ul>
-      <li><strong>Precio:</strong> {{ object.precio }}</li>
+      <li><strong>Precio:</strong> {{ object.precio }} $ </li>
       <li><strong>Descripcion:</strong> {{ object.descripcion }}</li>
       <li><strong>Categoria:</strong> {{ object.categoria.nombre }}</li>
-      <li><strong>Proveedor:</strong> {{ object.proveedor }}</li>
+      <li><strong>Proveedor: </strong><a href="{%url 'proveedor-detail' object.proveedor.pk %}">{{object.proveedor}}</a></li>
     </ul>
-
+      &nbsp
+    <div>
+        {% if user.is_authenticated %}
+        {% else %}
+        <li>
+            No puedes agregar productos o ver tu carrito si no te logueas
+        </li>
+        {% endif %}
+    </div>
+&nbsp
     <div class="block">
-      <a href="{% url 'add-to-cart' product_pk=object.pk %}" class='button is-primary'>
-        Añadir al carrito
-      </a>
-      <a href="{% url 'pedido-detail' %}" class='button'>
-        Ver carrito
-      </a>
+        <a href="{% if user.is_authenticated %} {% url 'add-to-cart' product_pk=object.pk %} {% else %} {% endif %} " class='button {% if user.is_authenticated %} is-primary {% else %} is-danger {% endif %}' >
+          Añadir al carrito
+        </a>
+        <a href="{% if user.is_authenticated %} {% url 'pedido-detail' %} {% else %} {% endif %}" class='button {% if user.is_authenticated %} is-primary {% else %} is-danger {% endif %}'>
+          Ver carrito
+        </a>
     </div>
     <hr>
     <ul>

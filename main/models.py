@@ -1,65 +1,28 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+import datetime
+
 # Create your models here.
-class Profile(models.Model):
-    # Relacion con el modelo User de Django
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-
-    # Atributos adicionales para el usuario
-    documento_identidad = models.CharField(max_length=8)
-    fecha_nacimiento = models.DateField()
-    estado = models.CharField(max_length=3)
-    ## Opciones de genero
-    MASCULINO = 'MA'
-    FEMENINO = 'FE'
-    NO_BINARIO = 'NB'
-    GENERO_CHOICES = [
-        (MASCULINO, 'Masculino'),
-        (FEMENINO, 'Femenino'),
-        (NO_BINARIO, 'No Binario')
-    ]
-    genero = models.CharField(max_length=2, choices=GENERO_CHOICES)
-
+class Proveedor(models.Model):
+    ruc = models.CharField(max_length=11)
+    razon_social = models.CharField(max_length=20)
+    telefono = models.CharField(max_length=9)
     def __str__(self):
-        return self.user.get_username()
+        return self.razon_social
 
-class Colaborador(models.Model):
-    # Relacion con el modelo Perfil
-    user_profile = models.OneToOneField(Profile, on_delete=models.CASCADE)
-
-    # Atributos especificos del Colaborador
-    reputacion = models.FloatField()
-    cobertura_entrega = models.ManyToManyField(to='Localizacion')
-
+class Categoria(models.Model):
+    codigo = models.CharField(max_length=4)
+    nombre = models.CharField(max_length=50)
     def __str__(self):
-        return f'Colaborador: {self.user_profile.user.get_username()}'
+        return f'{self.codigo}: {self.nombre}'
 
 class Localizacion(models.Model):
     distrito = models.CharField(max_length=20)
     provincia = models.CharField(max_length=20)
     departamento = models.CharField(max_length=20)
-
-    def __str__(self):
+    def __str__ (self):
         return f'{self.distrito}, {self.provincia}, {self.departamento}'
-
-class Cliente(models.Model):
-    # Relacion con el modelo Perfil
-    user_profile = models.OneToOneField(Profile, on_delete=models.CASCADE)
-
-    # Atributos especificos del Cliente
-    preferencias = models.ManyToManyField(to='Categoria')
-
-    def __str__(self):
-        return f'Cliente: {self.user_profile.user.get_username()}'
-
-class Categoria(models.Model):
-    codigo = models.CharField(max_length=4)
-    nombre = models.CharField(max_length=20)
-
-    def __str__(self):
-        return f'{self.codigo}: {self.nombre}'
-
 class Producto(models.Model):
     # Relaciones
     categoria = models.ForeignKey('Categoria', on_delete=models.SET_NULL, null=True)
@@ -72,10 +35,7 @@ class Producto(models.Model):
     estado = models.CharField(max_length=3)
     descuento = models.FloatField(default=0)
 
-    def __str__(self):
-        return self.nombre
-
-    def precio_final(self):
+    def get_precio_final(self):
         return self.precio * (1 - self.descuento)
 
     def sku(self):
@@ -83,27 +43,74 @@ class Producto(models.Model):
         codigo_producto = str(self.id).zfill(6)
 
         return f'{codigo_categoria}-{codigo_producto}'
+    def __str__(self):
+        return self.nombre
 
-class Proveedor(models.Model):
-    ruc = models.CharField(max_length=11)
-    razon_social = models.CharField(max_length=20)
-    telefono = models.CharField(max_length=9)
+class ProductoImage(models.Model):
+    product = models.ForeignKey('Producto', on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to="products", null=True, blank=True)
+
+class Profile(models.Model):
+    # Relacion con el modelo User de Django
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    # Atributos adicionales para el usuario
+    documento_identidad = models.CharField(max_length=8)
+    fecha_nacimiento = models.DateField(blank=True)
+    estado = models.CharField(max_length=3, blank=True, null=True)
+    numero = models.CharField(max_length=9, null=False)
+    ## Opciones de genero
+    MASCULINO = 'MA'
+    FEMENINO = 'FE'
+    NO_BINARIO = 'NB'
+    GENERO_CHOICES = [
+        (MASCULINO, 'Masculino'),
+        (FEMENINO, 'Femenino'),
+        (NO_BINARIO, 'No Binario')
+    ]
+    genero = models.CharField(max_length=2, choices=GENERO_CHOICES)
+    def __str__(self):
+        return self.user.get_username()
+
+
+class Cliente(models.Model):
+    # Relacion con el modelo Perfil
+    user_profile = models.OneToOneField(Profile, on_delete=models.CASCADE)
+    # Atributos especificos del Cliente
+    preferencias = models.ForeignKey('Categoria', on_delete=models.SET_NULL,null=True)
+    RUC = models.CharField(max_length=11, null=True, blank=True)
+    def __str__(self):
+        return f'Cliente: {self.user_profile.user.get_username()}'
+
+class Colaborador(models.Model):
+    # Relacion con el modelo Perfil
+    user_profile = models.OneToOneField(Profile, on_delete=models.CASCADE)
+    # Atributos especificos del Colaborador
+    reputacion = models.FloatField()
+    cobertura_entrega = models.ManyToManyField(to='Localizacion')
 
     def __str__(self):
-        return self.razon_social
+        return f'Colaborador: {self.user_profile.user.get_username()}'
 
 class Pedido(models.Model):
     # Relaciones
-    cliente = models.ForeignKey('Cliente', on_delete=models.CASCADE, null=True)
+    cliente = models.ForeignKey('Cliente', on_delete=models.CASCADE)
     repartidor = models.ForeignKey('Colaborador', on_delete=models.SET_NULL, null=True)
-    ubicacion = models.ForeignKey('Localizacion', on_delete=models.SET_NULL, null=True)
+    localizacion = models.ForeignKey('Localizacion', on_delete=models.SET_NULL, null=True)
 
     # Atributos
-    fecha_creacion = models.DateTimeField(auto_now=True)
+    fecha_creacion = models.DateTimeField(blank=True, null=True)
     fecha_entrega = models.DateTimeField(blank=True, null=True)
-    estado = models.CharField(max_length=3)
+    estado = models.CharField(max_length=10)
     direccion_entrega = models.CharField(max_length=100, blank=True, null=True)
-    tarifa = models.FloatField(blank=True, null=True)
+    tarifa = models.FloatField(blank=True, null=True, default=0)
+    ## Opciones de Comprobante de Pago
+    BOLETA = 'Boleta'
+    FACTURA = 'Factura'
+    COMPROBANTES_CHOICES = [
+        (BOLETA, 'Boleta'),
+        (FACTURA, 'Factura')
+    ]
+    tipo_comprobante = models.CharField(max_length=7,choices=COMPROBANTES_CHOICES, default=BOLETA)
 
     def __str__(self):
         return f'{self.cliente} - {self.fecha_creacion} - {self.estado}'
@@ -119,17 +126,14 @@ class Pedido(models.Model):
 class DetallePedido(models.Model):
     # Relaciones
     producto = models.ForeignKey('Producto', on_delete=models.CASCADE)
-    pedido = models.ForeignKey('Pedido', on_delete=models.CASCADE, null=True)
+    pedido = models.ForeignKey('Pedido', on_delete=models.CASCADE)
 
     # Atributos
     cantidad = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
-        return f'{self.pedido.id} - {self.cantidad} x {self.producto.nombre}'
+        return f'{self.producto.nombre}'
 
     def get_subtotal(self):
-        return self.producto.precio_final() * self.cantidad
+        return self.producto.get_precio_final() * self.cantidad
 
-class ProductoImage(models.Model):
-    product = models.ForeignKey('Producto', on_delete=models.CASCADE, related_name='images')
-    image = models.ImageField(upload_to="products", null=True, blank=True)

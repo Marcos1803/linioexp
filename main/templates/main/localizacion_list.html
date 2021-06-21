@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+        <h3 class="title">Localizaciones</h3>
+        <ul>
+            {%for localizacion in  object_list%}
+            <li>
+                <a href="{%url 'localizacion-detail' localizacion.pk %}">{{localizacion.distrito}}</a>
+            </li>
+            {%endfor%}
+        </ul>
+        <ul>
+           &nbsp
+            <li><a href="{% url 'home' %}">Inicio</a></li>
+        </ul>
+{% endblock %}

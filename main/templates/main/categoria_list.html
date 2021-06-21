@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+        <h3 class="title">Categorias</h3>
+        <ul>
+            {%for categoria in  object_list%}
+            <li>
+                <a href="{%url 'categoria-detail' categoria.pk %}">{{categoria.nombre}}</a>
+            </li>
+            {%endfor%}
+        </ul>
+        <ul>
+            <li><a href="{% url 'home' %}">Inicio</a></li>
+        </ul>
+{% endblock %}

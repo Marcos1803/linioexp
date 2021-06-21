@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+        <h3 class="title">Proveedores</h3>
+        <ul>
+            {%for proveedor in  object_list%}
+            <li>
+                <a href="{%url 'proveedor-detail' proveedor.pk %}">{{proveedor.razon_social}}</a>
+            </li>
+            {%endfor%}
+        </ul>
+        <ul>
+                        &nbsp
+            <li><a href="{% url 'home' %}">Inicio</a></li>
+        </ul>
+{% endblock %}

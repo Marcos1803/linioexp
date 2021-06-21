@@ -19,20 +19,41 @@
               {% for detalle in detalles %}
                 <li>
                   {{ detalle }}
-                  <a href="{% url 'add-to-cart' product_pk=detalle.producto.pk %}" class="button is-success">
+                    &nbsp
+                  <a href="{% url 'add-to-cart' product_pk=detalle.producto.pk %}" class="button is-success is-rounded">
                     +
                   </a>
-                  <a href="{% url 'remove-from-cart' product_pk=detalle.producto.pk %}" class="button is-danger">
+                    &nbsp
+                  <a href="{% url 'remove-from-cart' product_pk=detalle.producto.pk %}" class="button is-danger is-rounded">
                     -
                   </a>
+                    &nbsp
+                  <a href="{% url 'remove-all-from-cart' product_pk=detalle.producto.pk %}" class="button is-danger is-rounded">
+                    Eliminar
+                  </a>
+                    &nbsp
+                    &nbsp
+                    <label>Cantidad: </label>
+                    {{ detalle.cantidad }}
+                    <label>| Subtotal: </label>
+                  {{ detalle.get_subtotal }}
+                    <label>$</label>
                 </li>
+              {% empty %}
+                <hr3>No tienes productos en tu carrito</hr3>
               {% endfor %}
             </ul>
         </div>
     </div>
-    <a href="{% url 'pedido-update' pk=object.pk %}" class='button is-info'>
+<div>
+    {% if detalles %}
+        <a href="{% url 'pedido-update' pk=object.pk %}" class='button is-info'>
       Checkout
     </a>
+    {% else %}
+    Agrega producto a tu carrito para poder continuar con el pedido.
+    {% endif %}
+</div>
     <hr>
     <div class="content">
         <ul>

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+        {% if user.is_authenticated %}
+            <h3> Hola {{ user.get_username }} </h3>
+            <h3> Pedidos Anteriores </h3>
+            <div class="content">
+                {%for Pedido in  object_list%}
+                <li>
+                    <a href="{%url 'pedido-cliente' Pedido.pk %}">{{Pedido.fecha_creacion}} | {{Pedido.estado}}</a>
+                </li>
+                {% empty %}
+                <div class="content">
+                    &nbsp
+                    <h6>No tiene pedidos anteriores</h6>
+                </div>
+                {%endfor%}
+            </div>
+            {% else %}
+            <h3> Hola para ver tus pedidos debes tener una cuenta de Linio</h3>
+            <div class="container">
+                <div class="columns is-centered">
+                  <div class="column is-half">
+                    <a class="button is-link is-centered" href="{% url 'login' %}">Inicia Sesion</a>
+                    <a class="button is-link" href="{% url 'register' %}">Registrate</a>
+                  </div>
+                </div>
+            </div>
+        {% endif %}
+        <ul>
+            Atención al cliente: 990154244
+        </ul>
+<ul>
+            Dirección de Oficinas Linio Express: Av. Comercios 154
+        </ul>
+        <ul>
+            <li><a href="{% url 'home' %}">Inicio</a></li>
+        </ul>
+{% endblock %}

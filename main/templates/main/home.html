@@ -1,8 +1,17 @@
 {% extends "base.html" %}
 
 {% block content %}
+&nbsp
+{% if cliente.user_profile.user.is_authenticated %}
+hola cliente
+{% else %}
+{% endif %}
     {% if user.is_authenticated %}
     <h3> Hola {{ user.get_username }} </h3>
+    <ul>
+      <a><a href="{% url 'pedido-list' %}">Ver Pedidos</a></a> |
+      <a><a href="{% url 'pedido-detail' %}">Ver Carrito</a></a>
+    </ul>
     <p>
       <a href="{% url 'logout' %}">Cierra Sesion</a>
     </p>
@@ -13,33 +22,85 @@
       <a href="{% url 'register' %}">Registrate</a>
     </p>
     {% endif %}
-
-    <hr>
-
     {% if messages %}
-    {% for message in messages %}
-    <div class="notification {% if message.tags %}is-{{ message.tags }}{% endif %}">
-        <button class="delete"></button>
-        {{ message }}
-    </div>
-    {% endfor %}
-{% endif %}
-
-    <h5> Ultimos productos </h5>
-    <ul>
-      {% for producto in latest_products %}
-        <li>
-          <a href="{% url 'product-detail' producto.pk %}">
-            {{ producto.nombre }}
-          </a>
-          - {{ producto.precio }}
-        </li>
-      {% empty %}
-        <li>Aun no hay productos disponibles.</li>
-      {% endfor %}
-    </ul>
+        {% for message in messages %}
+        <div class="notification {% if message.tags %}is-{{ message.tags }}{% endif %}">
+            <button class="delete"></button>
+            {{ message }}
+        </div>
+        {% endfor %}
+    {% endif %}
     <hr>
+    <h5><strong> Últimos productos</strong> </h5>
+<div class="columns is-multiline">
+    {% for producto in latest_products %}
+        <div class="column is-one-quarter">
+                    <div class="card">
+                        <div class="card-image">
+                            <figure class="image">
+                                <img src="{{ producto.images.first.image.url|default:'https://via.placeholder.com/128' }}" alt="Imagen no disponible">
+                            </figure>
+                        </div>
+                        <div class="card-content">
+                            <h6>
+                                <a href="{% url 'product-detail' producto.pk %}">
+                                    {{ producto.nombre }}
+                                </a>
+                            </h6>
+                            <p>$ {{ producto.precio }}</p>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="content">
+                    &nbsp
+                    <h6>Aun no hay productos disponibles.</h6>
+                </div>
+            {% endfor %}
+        </div>
+    <hr>
+{% if user.is_authenticated %}
+<h5><strong> Productos que podrian gustarte de la categoría: {{user.profile.cliente.preferencias.nombre}}</strong></h5>
+<div class="columns is-multiline">
+    {% for producto in productos %}
+        {% if producto.categoria == user.profile.cliente.preferencias %}
+        <div class="column is-one-quarter">
+                    <div class="card">
+                        <div class="card-image">
+                            <figure class="image">
+                                <img src="{{ producto.images.first.image.url|default:'https://via.placeholder.com/128' }}" alt="Imagen no disponible">
+                            </figure>
+                        </div>
+                        <div class="card-content">
+                            <h6>
+                                <a href="{% url 'product-detail' producto.pk %}">
+                                    {{ producto.nombre }}
+                                </a>
+                            </h6>
+                            <p>$ {{ producto.precio }}</p>
+                        </div>
+                    </div>
+                </div>
+        {% else %}
+        {% endif %}
+    {% empty %}
+        <div class="content">
+            &nbsp
+            <h6>Aun no hay productos disponibles.</h6>
+        </div>
+    {% endfor %}
+{% else %}
+{% endif %}
+        </div>
+
+
     <ul>
       <li><a href="{% url 'product-list' %}">Ver Lista de Productos Completa</a></li>
+    </ul>
+    <ul>
+      <li><a href="{% url 'proveedor-list' %}">Mira nuestros comercios</a></li>
+    </ul>
+    <ul>
+      <li><a href="{% url 'localizacion-list' %}">Mira nuestras zonas de cobertura</a></li>
     </ul>
 {% endblock %}

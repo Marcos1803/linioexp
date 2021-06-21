@@ -1,15 +1,13 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <script src="https://www.paypal.com/sdk/js?client-id=AQtsd6iSP6Wlpu9gCfxuJ3x_HkD9yN0q7S1zoFm4io12-gh_GJELCTNCXma6g9nXb7btAPYE_qW13BrV"> // Replace YOUR_SB_CLIENT_ID with your sandbox client ID
+    <script src="https://www.paypal.com/sdk/js?client-id=AZBwfF8Lp2HL1dbwwwA6bJUDqDPoFLCxxuOXNaLyrXDiEU1B1FO4aXbjlyiLu2Z6O_c0dhZlKW-lDrUB
+"> // Replace YOUR_SB_CLIENT_ID with your sandbox client ID
     </script>
 
     <h3 class="title">Precio total del pedido: {{ pedido.get_total }}</h3>
 
     <div class="block" id="paypal-button-container"></div>
-
-    <!--Esto se agrego para testear que pasaria si se completa el pago-->
-    <a href="{% url 'complete-payment' %}">Completar pago de prueba</a>
 
     <!-- Add the checkout buttons, set up the order and approve the order -->
     <script>
